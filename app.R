@@ -1,164 +1,178 @@
 
-library(shiny)
-library(shinydashboard)
-library(tidyverse)
-library(ggthemes)
-library(DT)
+# Notes: Any code that is above the UI in a shiny app is run once, when the app
+# is started. 
 
-province_rd <- read_csv("Data/27100341-eng/27100341.csv") %>%
-  mutate(VALUE = if_else(SCALAR_FACTOR == "millions", VALUE * 1.0e+06, VALUE)) %>%
-  mutate(across(
-    .cols = c("Research and development characteristics",
-              "GEO",
-              "Country of control", 
-              "North American Industry Classification System (NAICS)"),
-    fct_inorder
-  ))
+# Packages ----------------------------------------------------------------
 
-map_df <- mapcan::mapcan(type = "standard", boundaries = "province")
+# install.packages(c("tidyverse", "shiny", "DT", "scales"))
+
+library(tidyverse) # Data manipulation and plotting
+library(shiny) # Creates the shiny app
+library(DT) # Interative table. We only need to load the DT package because 
+            # I am formatting one of the cols in the table
+library(scales) # Formatting the scales and labels on the plot
 
 
+# Data Import -------------------------------------------------------------
 
-min_year <- min(province_rd$REF_DATE, na.rm = TRUE)
-max_year <- max(province_rd$REF_DATE, na.rm = TRUE)
+# Notice that the data files need to be located in the same directory as the
+# app. When the app is deployed to a server, the server needs to be able to
+# access the data, and it can only do that if the data is in a location the
+# server can access.
+rd_data <- read_csv("Data/27100337-eng/27100337.csv") %>% 
+  # This data cleaning is optional
+  filter(!`Occupational category` %in% c("Researchers and research managers", 
+                                         "Research and development technical, administrative and support staff")) %>% 
+  mutate(across(contains(" "), fct_inorder)) %>% 
+  mutate(across(`Occupational category`, fct_rev))
 
-ui <- dashboardPage(
-    dashboardHeader(title = "R&D"),
-    dashboardSidebar(
-      sidebarMenu(
-        selectInput("naics", 
-                    "North American Industry Classification System (NAICS)", 
-                    choices = unique(province_rd$`North American Industry Classification System (NAICS)`)), 
-        selectInput("provs",
-                    "Provinces",
-                    choices = unique(province_rd$GEO),
-                    selected = unique(province_rd$GEO),
-                    multiple = TRUE),
-        selectInput("coc", 
-                    "Country of control", 
-                    choices = unique(province_rd$`Country of control`)),
-        selectInput("dollar_v_people",
-                    "Dollars or people?",
-                    choices = unique(province_rd$UOM)),
-        sliderInput("year",
-                    "Year",
-                    value = max_year,
-                    step = 1,
-                    min = min_year,
-                    max = max_year, 
-                    sep = "",
-                    ticks = FALSE)
-      )),
-    dashboardBody(
-      fluidRow(box(plotOutput("map")),
-               box(plotOutput("breakdown"))),
-    fluidRow(column(12, dataTableOutput("data"))))
-)
+# We are referencing the min/max years from the data alot, so I extracted them
+# into variables
+min_year <- min(rd_data$REF_DATE)
+max_year <- max(rd_data$REF_DATE)
 
-
-
-server <- shinyServer(function(input, output) {
+ui <- fluidPage(
+  # Add a title 
+  titlePanel("R&D Personnel"),
   
-  data <- reactive({
-    province_rd %>%
-      filter(
-        `North American Industry Classification System (NAICS)` == input$naics,
-        GEO %in% input$provs,
-        `Country of control` == input$coc,
-        UOM == input$dollar_v_people,
-        REF_DATE %in% input$year
+  # We will use a sidebarLayout to orginize our app, with the inputs in the
+  # sidebarPanel, and the outputs in the mainPanel
+  sidebarLayout(
+    # By default the side bar has a width of 4, but we dont need that much space
+    sidebarPanel(width = 2,
+      
+      # look for where input$year occurs in the server to see where the year
+      # impacts the data
+      sliderInput("year", "Year",
+                  sep = "",
+                  min = min_year,
+                  max = max_year, 
+                  # we are using a vector here to have a slider with two values
+                  value = c(max_year - 2, max_year)),
+      
+      # look for where input$category occurs in the server to see where the
+      # category impacts the data
+      selectInput('category', "Occupational category", 
+                  
+                  # Using `unique()` lets the app read the choices from the
+                  # data. You can also manually supply choices using a vector
+                  # (e.g., `c("Choice 1", "Choice 2")`)
+                  choices = unique(rd_data$`Occupational category`),
+                  # Select all options by default
+                  selected = unique(rd_data$`Occupational category`), 
+                  # You can use the multiple argument to control if the user can
+                  # select multiple options, or only on (the default)
+                  multiple = TRUE),
+      
+      # look for where input$coc occurs in the server to see where the country
+      # of control impacts the data
+      selectInput("coc", "Country of control", 
+                  # reading choices from the data again
+                  choices = unique(rd_data$`Country of control`)),
+      
+      # look for where input$NAICS occurs in the server to see where the NAICS
+      # impacts the data
+      selectInput("NAICS", "North American Industry Classification System (NAICS)", 
+                  choices = unique(rd_data$`North American Industry Classification System (NAICS)`))
+      
+    ),
+    
+    # Outputs are in the mainPanel
+    mainPanel(
+      
+      # I have my mainPanel organized into two rows. In the first row i have a
+      # plot
+      fluidRow(
+        
+        # Look at the output$plot expression in the server to see the code that
+        # creates this output
+        plotOutput("plot", 
+                   
+                   # The default plot height can be kind of small, so I am
+                   # increasing the height of the plot
+                   height = "550px")
+        
+        ),
+      
+      fluidRow(
+        # Adding a horizontal line above the table to better distinguish between
+        # the plot area and the table area
+        hr(style = "border-top: 1px solid black;"),
+        
+        # Look at the output$table expression in the server to see the code that
+        # creates this output
+        dataTableOutput("table")
+        )
       )
+    )
+  )
+
+server <- function(input, output) { 
+  
+  # creates the html for plotOutput("plot")
+  output$plot <- renderPlot({
+    
+    # This is a static dataframe that we created when the app was launched.
+    rd_data %>% 
+      
+      # We can filter that static df using the inputs to create a df that is
+      # reactive to the inputs
+      filter(
+        
+        # A two value slider returns a vector with the min and max values of the
+        # slider. Using the between function to check that the REF_DATE falls
+        # within that range from the slider
+        between(REF_DATE, min(input$year), max(input$year)),
+        
+        # Single selectInputs() return a sigle string that we can filter against
+        `Country of control`	== input$coc,
+        `North American Industry Classification System (NAICS)` == input$NAICS,
+        
+        # input$category accepts multiple selections, so we are checking that
+        # the value is in the vector returned by input$category
+        `Occupational category` %in% input$category ) %>% 
+      
+      ggplot(aes(x = as.factor(REF_DATE), y = VALUE, 
+                 fill = `Occupational category`,
+                 group = `Occupational category`,
+                 label = comma(VALUE, accuracy = 1, suffix = " FTE"))) +
+      
+      geom_col(position = position_dodge()) +
+      geom_label(position = position_dodge(width = 0.9), 
+                 alpha = 0.5,
+                 fill = "white") +
+      
+      coord_flip() +
+      scale_fill_discrete(guide = guide_legend(title.position = "top",
+                                               title.hjust = 0.5,
+                                               ncol = 2, 
+                                               reverse = TRUE))+
+      scale_y_continuous(labels = comma_format(),
+                         breaks = pretty_breaks(10))+
+      theme_minimal(base_size = 20) +
+      theme(legend.position = "bottom") +
+      labs(x = "", 
+           y = "full-time equivalent (FTE)")
     
   })
   
-  output$data <- renderDataTable({
+  output$table <- renderDataTable({
     
-    res <- data() %>% 
-      select(
-        -ends_with("_ID"),
-        -DGUID,
-        -UOM,
-        -COORDINATE,
-        -SYMBOL,
-        -TERMINATED,
-        -DECIMALS,
-        -STATUS,
-        -VECTOR,
-        -SCALAR_FACTOR
-      ) %>%
-      arrange(REF_DATE, GEO, `Research and development characteristics`) %>%
-      datatable(options = list(pageLength = 10))
-    
-    
-    if(input$dollar_v_people == "Dollars"){
-      res %>%
-        formatCurrency(columns = 'VALUE') 
-    } else {
-      res %>% formatRound(columns = "VALUE", digits = 0)
-    }
+    rd_data %>% 
+      filter(between(REF_DATE, min(input$year), max(input$year)),
+             `Country of control`	== input$coc,
+             `North American Industry Classification System (NAICS)` == input$NAICS,
+             `Occupational category` %in% input$category ) %>% 
+      select(-DGUID,-GEO, -UOM:-COORDINATE, -SYMBOL:-DECIMALS) %>% 
+      arrange(REF_DATE, 
+              `North American Industry Classification System (NAICS)`,
+              `Country of control`,
+              desc(`Occupational category`)) %>% 
+      datatable() %>% 
+      formatRound('VALUE', digits = 0)
     
   })
   
-  output$map <- renderPlot({
-    
-    p <- data() %>% 
-      full_join(map_df, by = c("GEO" = "pr_english")) %>%
-      filter(`Research and development characteristics` == if_else(input$dollar_v_people == "Dollars",
-                                                                   "Total in-house research and development expenditures", 
-                                                                   "Total in-house research and development personnel")) %>% 
-      ggplot(aes(long, lat, group = group, fill = VALUE)) +
-      geom_polygon(colour = "black") + 
-      coord_fixed() +
-      scale_y_continuous(expand = c(0,0))+
-      scale_x_continuous(expand = c(0,0))+
-      theme_void()
-    
-    if(input$dollar_v_people == "Dollars"){
-      p + scale_fill_continuous_tableau("Blue",
-                                        labels = scales::dollar_format(scale = 1/1.0e+6, suffix = " M"), 
-                                        name = "Dollars") +
-        labs(title = "")
-    } else {
-      p + scale_fill_continuous_tableau("Blue",
-                                        labels = scales::comma_format(), 
-                                        name = "FTEs") +
-        labs(title = "")
-    }
-    
-    
-    
-  })
-  
-  output$breakdown <- renderPlot({
-    
-    data() %>% 
-      filter(`Research and development characteristics` != if_else(input$dollar_v_people == "Dollars",
-                                                                   "Total in-house research and development expenditures", 
-                                                                   "Total in-house research and development personnel")) %>% 
-      ggplot(aes(x = GEO, 
-                 y = VALUE, 
-                 fill = `Research and development characteristics` )) +
-      geom_col(position="fill") +
-      geom_hline(yintercept = c(0.25, .5, .75)) +
-      coord_flip() + 
-      theme_void() +
-      scale_y_continuous(expand = c(0,NA))+
-      scale_x_discrete(expand = c(0,NA))+
-      scale_fill_tableau(palette = "Classic Cyclic",
-                         guide = guide_legend(nrow = 3, title.position = "top", title.hjust = 0.5, reverse = TRUE))+
-      theme(legend.position="bottom",
-            axis.text.y = element_text(hjust = 1, margin = margin(0, 10, 0, 0)), 
-            axis.line.y = element_line(),
-            panel.grid.major.y = element_line(colour = "grey", linetype = "dashed"),
-            plot.margin = margin(0,10,0,0, "pt"))
-    
-    
-    
-  })
-  
-})
+  }
 
-
-shinyApp(ui = ui, server = server)
-
-
+shinyApp(ui, server)

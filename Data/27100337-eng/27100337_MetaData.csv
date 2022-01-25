@@ -1,0 +1,133 @@
+﻿"Cube Title","Product Id","CANSIM Id",URL,"Cube Notes","Archive Status",Frequency,"Start Reference Period","End Reference Period","Total number of dimensions"
+"Business enterprise in-house research and development personnel occupational categories, by industry group based on the North American Industry Classification System (NAICS) and country of control","27100337","358-0514","https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=2710033701",1;2;3;4;5;6;8,"CURRENT - a cube available to the public and that is current","Annual","2014-01-01","2019-01-01","4",
+
+"Dimension ID","Dimension name","Dimension Notes","Dimension Definitions"
+"1","Geography",,""
+"2","North American Industry Classification System (NAICS)",,""
+"3","Country of control",,""
+"4","Occupational category",,""
+
+"Dimension ID","Member Name","Classification Code","Member ID","Parent Member ID",Terminated,"Member Notes","Member Definitions"
+"1","Canada","[11124]","1","","",,
+"2","Total all industries","","1","","",,
+"2","Agriculture, forestry, fishing and hunting","","2","1","",,
+"2","Agriculture (except aquaculture) and support activities for crop production and animal production","[111, 1121-1124, 1129, 1151, 1152]","3","2","",,
+"2","Forestry, logging and support activities for forestry","[113, 1153]","4","2","",,
+"2","Fishing, hunting and trapping and aquaculture","[114, 1125]","5","2","",,
+"2","Mining, quarrying, and oil and gas extraction","","6","1","",,
+"2","Oil and gas extraction, contract drilling and related services","[211, 213111, 213118]","7","6","",,
+"2","Mining and quarrying, contract drilling and related support activities","[212, 213117, 213119]","8","6","",,
+"2","Utilities","","9","1","",,
+"2","Electric power generation, transmission and distribution","[2211]","10","9","",,
+"2","Natural gas distribution and water, sewage and other systems","[2212, 2213]","11","9","",,
+"2","Construction","[23]","12","1","",,
+"2","Manufacturing","","13","1","",,
+"2","Food manufacturing","[311]","14","13","",,
+"2","Beverage and tobacco product manufacturing","[312]","15","13","",,
+"2","Textile mills and textile product mills","[313, 314]","16","13","",,
+"2","Wood product manufacturing","[321]","17","13","",,
+"2","Paper manufacturing","[322]","18","13","",,
+"2","Printing and related support activities","[323]","19","13","",,
+"2","Petroleum and coal product manufacturing","[324]","20","13","",,
+"2","Chemical manufacturing","","21","13","",,
+"2","Pharmaceutical and medicine manufacturing","[3254]","22","21","",,
+"2","All other chemical manufacturing","[3251-3253, 3255, 3256, 3259]","23","21","",,
+"2","Plastic product manufacturing","[3261]","24","13","",,
+"2","Rubber product manufacturing","[3262]","25","13","",,
+"2","Non-metallic mineral product manufacturing","[327]","26","13","",,
+"2","Primary metal manufacturing","[331]","27","13","",,
+"2","Fabricated metal product manufacturing","[332]","28","13","",,
+"2","Machinery manufacturing","[333]","29","13","",,
+"2","Computer and electronic product manufacturing","","30","13","",,
+"2","Computer and peripheral equipment manufacturing","[3341]","31","30","",,
+"2","Communications equipment manufacturing","[3342]","32","30","",,
+"2","Semiconductor and other electronic component manufacturing","[3344]","33","30","",,
+"2","Navigational, measuring, medical and control instruments manufacturing","[3345]","34","30","",,
+"2","All other computer and electronic product manufacturing","[3343, 3346]","35","30","",,
+"2","Electrical equipment, appliance and component manufacturing","[335]","36","13","",,
+"2","Transportation equipment manufacturing","","37","13","",,
+"2","Motor vehicle, motor vehicle body and trailer and motor vehicle parts manufacturing","[3361-3363]","38","37","",,
+"2","Aerospace product and parts manufacturing","[3364]","39","37","",,
+"2","All other transportation equipment manufacturing","[3365, 3366, 3369]","40","37","",,
+"2","Furniture and related product manufacturing","[337]","41","13","",,
+"2","All other manufacturing","[315, 316, 339]","42","13","",,
+"2","Services-producing industries","","43","1","",,
+"2","Wholesale trade","","44","43","",,
+"2","Personal and household goods merchant wholesalers","","45","44","",,
+"2","Pharmaceuticals and pharmacy supplies merchant wholesalers","[41451]","46","45","",,
+"2","All other personal and household goods merchant wholesalers","[4141-4144, 41452]","47","45","",,
+"2","Machinery, equipment and supplies merchant wholesalers","[417]","48","44","",,
+"2","Miscellaneous merchant wholesalers","[418]","49","44","",,
+"2","All other wholesalers","[411, 412, 413, 415, 416, 419]","50","44","",,
+"2","Retail trade","[44-45]","51","43","",,
+"2","Transportation and warehousing","[48-49]","52","43","",,
+"2","Information and cultural industries","","53","43","",,
+"2","Software publishers","[5112]","54","53","",,
+"2","Telecommunications and data processing, hosting and related services","[517, 518]","55","53","",,
+"2","All other information and cultural industries","[5111, 512, 515, 519]","56","53","",,
+"2","Finance, insurance and real estate and rental and leasing","","57","43","",,
+"2","Finance and insurance","[52]","58","57","",,
+"2","Real estate and rental and leasing","[53]","59","57","",,
+"2","Professional, scientific and technical services","","60","43","",,
+"2","Architectural, engineering and related services","[5413]","61","60","",,
+"2","Computer systems design and related services","[5415]","62","60","",,
+"2","Management, scientific and technical consulting services","[5416]","63","60","",,
+"2","Scientific research and development services","","64","60","",,
+"2","Research and development in the physical, engineering and life sciences","[54171]","65","64","",,
+"2","Research and development in the social sciences and humanities","[54172]","66","64","",,
+"2","All other professional, scientific and technical services","[5411, 5412, 5414, 5418, 5419]","67","60","",,
+"2","Management of companies and enterprises","[55]","68","43","",,
+"2","Administrative and support, waste management and remediation services","[56]","69","43","",,
+"2","Educational services","[61]","70","43","",7,
+"2","Health care and social assistance","[62]","71","43","",,
+"2","All other services","[71, 72, 81]","72","43","",,
+"2","Information and communication technology (ICT) sector","","73","1","",,
+"2","Information and communication technology - Manufacturing","[3341, 3342, 3343, 3344, 3346]","74","73","",,
+"2","Information and communication technology - Services-producing industries","[4173, 5112, 517, 518, 5415, 8112]","75","73","",,
+"2","Cannabis industries","[111412, 111995, 312310, 413410, 453993]","76","1","",,
+"3","Total country of control","","1","","",,
+"3","Canada","","2","1","",,
+"3","Foreign","","3","1","",,
+"4","Total in-house research and development personnel","","1","","",,
+"4","Researchers and research managers","","2","1","",,
+"4","Scientists, social scientists, engineers and researchers","","3","2","",,
+"4","Senior research managers","","4","2","",,
+"4","Research and development technical, administrative and support staff","","5","1","",,
+"4","Technicians, technologists and research assistants","","6","5","",,
+"4","Other research and development technical, administrative and support staff","","7","5","",,
+"4","On-site research and development consultants and contractors","","8","1","",,
+
+Symbol Legend
+Description,Symbol
+"not available for a specific reference period","..",
+"less than the limit of detection","<LOD",
+"value rounded to 0 (zero) where there is a meaningful distinction between true zero and the value that was rounded","0s",
+"data quality: excellent","A",
+"data quality: very good","B",
+"data quality: good","C",
+"data quality: acceptable","D",
+"use with caution","E",
+"too unreliable to be published","F",
+"not applicable","...",
+"preliminary","p",
+"revised","r",
+"suppressed to meet the confidentiality requirements of the Statistics Act","x",
+"terminated","t",
+
+"Survey Code","Survey Name"
+"4201","Annual Survey of Research and Development in Canadian Industry"
+
+"Subject Code","Subject Name"
+"27","Science and technology"
+
+"Note ID",Note
+1,"In-house or intramural research and development refers to research and development that is performed within the organization, whatever the source of funds. In-house research and development comprise creative and systematic work undertaken in order to increase the stock of knowledge - including knowledge of humankind, culture and society - and devise new applications of available knowledge."
+2,"Refer to the attached link for a complete listing of the <a href="http://www23.statcan.gc.ca/imdb/p3VD.pl?Function=getVDIndex&adm=0&dis=0&TVD=214300"> industry groups</a> and their associated North American Industry Classification System (NAICS)."
+3,"The sum of individual categories may not always add to the total due to rounding."
+4,"Data quality indicators are based on the coefficient of variation (CV) and number of observations. Quality indicators indicate the following: A - Excellent (CV between 0% and 4.9%); B - Very good (CV between 5.0% and 9.9%); C - Good (CV between 10.0% and 14.9%); D - Acceptable (CV between 15.0% and 24.9%); E - Use with caution (CV between 25.0% and 34.9%); F - Too unreliable to be published (CV greater than or equal to 35.0%)."
+5,"Classification of companies into North American Industry Classification System (NAICS) codes and county of control is determined for the survey population at time of reference year sampling."
+6,"In-house research and development personnel is measured in full-time equivalent (FTE). Full-time equivalent or a person-year is equal to the number of persons who work solely on research and development projects and an estimate of time of persons working part of their time on research and development."
+8,"Values may have been randomly adjusted to meet the confidentiality requirements of the Statistics Act. The quality indicators reflect the impact on the precision of the estimate of sampling, non-response and the random adjustment when applied."
+7,"North American Industry Classification System (NAICS) industry group 61 excludes 611310."
+
+"Correction ID","Correction Date","Correction Note"
