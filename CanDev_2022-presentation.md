@@ -13,6 +13,15 @@ output:
 
 
 
+
+```{=html}
+<script>
+  addClassKlippyTo("pre.r, pre.markdown");
+  addKlippy('left', 'top', 'auto', '1', 'Copy code', 'Copied!');
+</script>
+```
+
+
 ## Create a new shiny app
 
 Open RStudio and go to:
@@ -21,10 +30,18 @@ Open RStudio and go to:
 
 R will open a new project for the shiny app, which will contain one file (`app.R`), which will have an example shiny app that you can run by clicking the `Run App` button (top right of the script panel).
 
-This is the home of your app, and any data, pictures, etc. you needs for your app to run need to be stored in the same directory!
+This is the home of your app, and any data, pictures, etc. you needs for your app to run need to be stored in the same directory so that they can be accessed by the app once it is deployed.
 
-> Note: Sure you have shiny installed. `install.packages("shiny")`
+> Note: Make sure you have shiny installed. 
 
+
+```r
+install.packages("shiny")
+```
+
+## Clone the workshop
+
+[You can download a copy of this workshop, and all the code here. ](https://github.com/woodtho/CanDev_2022/archive/refs/heads/main.zip) After downloading the file you can unzip it and then launch the project file (`CanDev_2022.Rproj`) in RStudio.
 
 ## App structure
 
@@ -38,7 +55,20 @@ This is the home of your app, and any data, pictures, etc. you needs for your ap
 
 The user interface (`ui`) object controls the layout and appearance of your app. The `server` function contains the instructions that a computer needs to build the app. Finally the `shinyApp` function creates the Shiny app from an explicit UI/server pair.
 
-We'll talk more shortly about what goes into the UI and the Server shortly...
+### Demo
+
+To run this code, please clone the project using the instructions above. 
+
+- In the code panel on the right side of the screen we can see the code for the server and the UI.
+  - In the UI tab, we can see that there is one slider input called "bins" and one plot output called "distPlot"
+  - In the server tab, you can see that there is on entry into the output list (`output$distPlot`), which matches the plot output we have in our UI
+    - The server code also references out slider input through the input list (`input$bins`)
+
+
+
+```r
+runApp("Old Faithful Geyser Data", display.mode = "showcase")
+```
 
 ## Reactivity
 
@@ -47,152 +77,159 @@ Shiny is about making it easy to wire up input values from a web page, making th
 The reactivity frame work used by shiny means that:
 
 - You can change inputs at any time, and the outputs that are impacted will updated immediately to reflect those changes.
-
 - All of this happens automatically, because Shiny is taking care of tracking "dependencies" for you.
-
 - You can simply access the inputs from the browser, using a list-like syntax, and you don't have to worry about write code to monitor changes.
 
 ## App template (Default)
 
-> All code in this demo that creates a shiny app can be copied directly into the console and run to create a shiny app. Please insure you have the required packages installed.
+> Most of the code in this demo that creates a shiny app can be copied directly into the console and run to lauch a shiny app. Please insure you have the required packages installed.
 
 
 ```r
 install.packages("shiny")
 ```
 
+- When building a shiny app, it is best to start with a template. 
+- By default RStudio will open all new shiny apps with a simple app that you can then modify it.
 
-Here are some templates that can be used to build a shiny app. This one creates an empty space where you can add your inputs, outputs, and other HTML.
-
-
-```r
-library(shiny)
-
-ui <- fluidPage()
-
-server <- function(input, output) { }
-
-shinyApp(ui, server)
-```
-
-You can use functions like fluidRow() and column() to organize your layout. 
-
-You can also use a higher-level function like sidebarLayout() add some structure to the app, dividing the space into a sidebarPanel(), and a mainPanel(). 
+Here is the basic skeleton of a shiny app:
 
 
 ```r
 library(shiny)
 
+# any code that should be executed once, when the app starts. E.g, reading in a
+# data file, creating static environment variables.
+
+# Code that creates the UI of the app
 ui <- fluidPage(
+  # Title for your app
+  titlePanel(), 
+  
   sidebarLayout(
-    sidebarPanel(),
-    mainPanel()
-    )
-  )
-
-server <- function(input, output) { }
-
-shinyApp(ui, server)
-```
-
-You can then further organize the layout with fluidRows and columns. Notice that column widths in the same row need to sum to 12!
-
-
-```r
-library(shiny)
-
-ui <- fluidPage(
-  sidebarLayout(
-    sidebarPanel(),
+    
+    # Generally inputs are put into the sidebar
+    sidebarPanel(
+      
+      # inputs go here
+      
+      ),
+    
+    # And outputs are put into the mainPanel
     mainPanel(
-      fluidRow(
-        column(width = 6),
-        column(width = 6)
-        ),
-      fluidRow(
-        
-        )
+      
+      # outputs go here
+      
       )
     )
   )
 
-server <- function(input, output) { }
+# The server takes inputs from the webpage, updates outputs, and send the
+# outputs back to the webpage
+server <- function(input, output) { 
+  
+  # server code goes here
+  
+  }
 
+# Used to launch the app after defining the UI and server.
 shinyApp(ui, server)
 ```
 
-To make this example a little clearer, we can add some content and optional styling to the app to illustrate where different content fits in the layout. 
+You do not always have to start an app like this, there are other templates that can be used, but a fluid page, with a sidebar layout is generally a good option. Fluid pages will reflow content when there isn't enough space, and sidebar layouts split your app into two panels, which can be useful for organizing inputs and outputs. 
 
-- notice that we are using several html tags to add styling to the static elements we are creating. Some tags are available from shiny directly as functions (e.g. `div()`, `h*()`, etc.), with more tags available in the `tags` object.
+You can have more control over the layout of an app using functions like `fluidRow()` and `column()`, but for the moment we will just organize the app with into the sidebar and main panel.
 
-- Also notice that we were able to adjust styling for elements like our rows and columns by passing a style argument. 
+## Static UI elements
+
+In addition to reactive elements, you may also want to include some static elements in your UI. Static elements are things like text, or images that do not change with user input. Common tags are available as functions from the shiny package (`div()`, `h1()`, `a()`, `br()`). You can insert less common tags using the `tags` object (e.g., `tags$abbr()`, `tags$figcaption()`). 
+
+Here is an example app with just static content:
 
 
 ```r
 library(shiny)
 
-ui <- fluidPage(
+# any code that should be executed once, when the app starts. E.g, reading in a
+# data file, creating static environment variables.
+
+# Code that creates the UI of the app
+ui <- fluidPage(# Title for your app
+  titlePanel("A first leavel heading title"),
+  
   sidebarLayout(
-    sidebarPanel(),
+    # Generally inputs are put into the sidebar
+    sidebarPanel(
+      h2("A second level heading"),
+      "This small Shiny application demonstrates some static UI elements."
+    ),
+    
+    # And outputs are put into the mainPanel
     mainPanel(
-      fluidRow(style = "border: 1px solid #000000;",
-        column(width = 6, style = "border: 1px solid red;",
-               tags$h1("a first level heading")),
-        column(width = 6, style = "border: 1px solid red;",
-               tags$button("a button"))
-        ),
-      fluidRow(style = "border: 1px solid #000000;",
-        HTML("<h1>Some HTML written in a string and rendered with HTML()</h1>
-             </hr>
-             <h2> some more text</h2>"),
-        tags$p("a paragraph")
-        )
+      h2("A second level header in the main panel"),
+      p('My first paragraph, with some ', strong('bold'), ' text.')
       )
     )
   )
 
-server <- function(input, output) { }
+# The server takes inputs from the webpage, updates outputs, and send the
+# outputs back to the webpage
+server <- function(input, output) { 
+  
+  # because the app is static, there is no server code!
+  
+  }
 
+# Used to launch the app after defining the UI and server.
 shinyApp(ui, server)
 ```
 
+- Notice that all of the elements we added were separated with commas inside both the sidebarPanel and the mainPanel 
+- [You can look at this tutorial for more examples of adding static content to your interface, incliding adding images and how to align text](http://shiny.rstudio-staging.com/tutorial/written-tutorial/lesson2/) 
+
+## Knowledge check 1
+
+1. Ever app has a UI and a Server
+2. Shiny apps are reactive - they have outputs that change based on the values of inputs
+3. Use an app template and slot in input, outputs, and server code
 
 ## Building your app around **Inputs and outputs**
 
-So far the apps we have seen have been very simple and only contained static elements that we created in the UI. But shiny is all about making things interactive. We do that by using inputs and outputs. 
+So far the apps we have seen have been very simple and contained mostly static elements that we created in the UI. But shiny is all about making things interactive. We do that by using inputs and outputs. 
 
 ### Inputs
 
-- Created with an *Input() function
+- Created with an `*Input()` function
 - Creates the HTML for your apps UI
 - Sends values from the web page back to the server
 
 | Function             | Collects                                                                                                 |
 |----------------------|----------------------------------------------------------------------------------------------------------|
-| actionButton()       | A button press                                                                                           |
-| checkboxInput()      | The state of a check box (TRUE/FALSE)                                                                     |
-| checkboxGroupInput() | The state of a group of check boxes (a vector of selected values)                                         |
-| dateInput()          | A single date (a date)                                                                                   |
-| dateRangeInput()     | A range of dates (a vector of the min and max date)                                                      |
-| fileInput()          | A file                                                                                                   |
-| numericInput()       | A numeric value                                                                                          |
-| passwordInput()      | A password                                                                                               |
-| radioButtons()       | The state of a group of radio buttons (Which option is selected)                                         |
-| selectInput()        | The current selection(s) for a drop down list (vector of length 1, or more, that includes selected values)|
-| sliderInput()        | A single number/date/date time or a range of the same (a single value, or a vector of the min and max)   |
-| textInput()          | A character string  (the entered text)                                                                   |
+| `actionButton()`       | A button press                                                                                           |
+| `checkboxInput()`      | The state of a check box (TRUE/FALSE)                                                                     |
+| `checkboxGroupInput()` | The state of a group of check boxes (a vector of selected values)                                         |
+| `dateInput()`          | A single date                                                                                |
+| `dateRangeInput()`     | A range of dates (a vector of the min and max date)                                                      |
+| `fileInput()`          | A file                                                                                                   |
+| `numericInput()`       | A numeric value                                                                                          |
+| `passwordInput()`      | A password                                                                                               |
+| `radioButtons()`       | The state of a group of radio buttons (Which option is selected)                                         |
+| `selectInput()`        | The current selection(s) for a drop down list (vector of length 1, or more, that includes only selected values)|
+| `sliderInput()`        | A single number/date/date time or a range of the same (a single value, or a vector of the min and max)   |
+| `textInput()`          | A character string  (a vector of the entered text)                                                                   |
 
 #### Syntax
 
-*Input(inputId, label, ...)
+`*Input(inputId, label, ...)`
 
-- inputId needs to be a string. You can't use special characters, other than underscores.
+- inputId needs to be a string and must be unique. You can't use special characters, other than underscores.
+  - It is used to create the id in the HTML for your input element
 - label describes what the input is for to the user and can use special characters.
 - ... means that there are some other specific arguments that are required, depending on the input being used (usually this is something like value or choices).
 
 #### Example
 
-When using a sidebarLayout() I typically place most of the inputs into the sidebarPanel and use the mainPanel for my outputs. Notice that the different inputs are separated with commas inside of the sidebarPanel.
+When using a `sidebarLayout()` I typically place most of the inputs into the sidebarPanel and use the mainPanel for my outputs. Notice that the different inputs are separated with commas inside of the sidebarPanel.
 
 
 ```r
@@ -226,26 +263,26 @@ shinyApp(ui, server)
 
 ### Outputs
 
-- Created with *Output() functions.
+- Created with `*Output()` functions.
 - Two parts, a space in the UI for the output once it has been rendered by the server, and code in the server to create the output. 
 - You must build the object in the server separately.
 
 | Function             | Inserts              |
 |----------------------|----------------------|
-| dataTableOutput()    | An interactive table |
-| tableOutput()        | A table              |
-| imageOutput()        | An image             |
-| plotOutput()         | A plot               |
-| textOutput()         | Text                 |
-| verbatimTextOutput() | Text                 |
-| uiOutput()           | a Shiny UI element   |
-| htmlOutput()         | Raw HTML             |
+| `dataTableOutput()`    | An interactive table |
+| `tableOutput()`        | A table              |
+| `imageOutput()`        | An image             |
+| `plotOutput()`         | A plot               |
+| `textOutput()`         | Text                 |
+| `verbatimTextOutput()` | Text                 |
+| `uiOutput()`           | a Shiny UI element   |
+| `htmlOutput()`         | Raw HTML             |
 
 #### Syntax
 
-*Output(outputId, ...)
+`*Output(outputId, ...)`
 
-- Output typically only require the outputId that is used by the server for saving the rendered html content
+- Output typically only require the outputId that is used by the server for saving the rendered HTML content
 
 #### Example
 
@@ -287,8 +324,14 @@ shinyApp(ui, server)
 ```
 
 - Notice that each output in the UI has a corresponding entry in the server.
-- Each output in the server is saved into the `output` object (output$outputId)
+- Each output in the server is saved into the `output` object (`output$outputId`)
 - There are different rendering function used. These turn the outputs into HTML that can be shown in the UI
+
+## Knowledge check 2
+
+1. 
+2. 
+3. 
 
 ## Tell the server how to assemble inputs into outputs
 
@@ -315,11 +358,11 @@ Before an output can be displayed by the webpage, it must be rendered. Which fun
 
 | Function          | Creates              |
 |-------------------|----------------------|
-| renderDataTable() | An interactive table |
-| renderTable()     | A table              |
-| renderPlot()      | A plot               |
-| renderText()      | A character string   |
-| renderUI()        | A Shiny UI element   |
+| `renderDataTable()` | An interactive table |
+| `renderTable()`     | A table              |
+| `renderPlot()`      | A plot               |
+| `renderText()`      | A character string   |
+| `renderUI()`        | A Shiny UI element   |
 
 
 ```r
@@ -380,8 +423,50 @@ server <- function(input, output) {
 shinyApp(ui, server)
 ```
 
+## Knowledge check 3
+
+1. 
+2. 
+3. 
+
+
 ## Deploy your app
 
 You can share a shiny app with anyone who has R and the required packages installed on their computer simply by sharing the code, and another required files, with them.
 
 If you want to share a shiny app with the public, or someone who doesn't have R and the required packages, you need to deploy your app to a shiny server. Shinyapps.io provides a free service that lets you upload a limited number of apps (there are paid plans with more active hours that allow for more apps to be loaded). [You can look at this article for details on deploying apps to Shinyapps.io.](https://shiny.rstudio.com/articles/shinyapps.html)
+
+
+
+
+## R&D Personnel App
+
+To run this code, please clone the project using the instructions above. 
+
+
+```r
+runApp()
+```
+
+You can look at the source code for the shiny app in `CanDev_2022/app.R`. 
+
+- App header
+  - load required packages
+  - Read in some data from `CanDev_2022/Data` and do some preprocessing
+
+- UI
+  - the app uses the layout template, which divides a fluidpage into a sidebar panel, and a main panel.
+  - All of our inputs are located in the sidebar
+    - one slider input (`input$year`), one multiple choice select input (`input$category`) and two single choice select inputs (`input$coc`, `input$NAICS`)
+  - All of the outputs are located in the main panel
+    - one plot output (`"plot"`) and one table output (`"table"`)
+  
+- Server
+  - In the server we create two entries into the output object using the inputs we created in the UI
+    - output$plot
+      - using the `renderPlot({ # Code that returns a plot})` function we can turn code that creates a plot into an output
+      - to make the plot interactive, we filter the static data we loaded at the start using the inputs
+    - output$table
+      - using the `renderDataTable({ # Code that returns a table})` function we can turn code that creates a table (or table like object) into an output
+      - to make the table interactive, we filter the static data we loaded at the start using the inputs. DataTable outputs by default also have some interactivity within the table (filtering, searching, arranging).
+      
