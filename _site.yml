@@ -1,0 +1,15 @@
+names: "Displaying data with R-shiny Dashboards"
+output_dir: "."
+navbar:
+  title: "Displaying data with R-shiny Dashboards"                          
+  type: inverse
+  right:
+    - text: "Contact me"
+      icon: fa-envelope-o
+      href: mailto:Thomas.wood@statcan.gc.ca?subject=R-shiny
+    - text: "GitHub"
+      icon: fa-github
+      href: https://github.com/woodtho/CanDev_2022
+output:
+  html_document:
+    theme: readable

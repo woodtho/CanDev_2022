@@ -1,5 +1,5 @@
 ---
-title: "Intro to Shiny"
+title: "Displaying data with R-shiny Dashboards"
 author: "Thomas Wood"
 date: "04/02/2022"
 theme: readable 
@@ -57,7 +57,7 @@ Here is a high level overview of a shiny app (we will cover each part in more sp
 slickR(
   list.files("img", full.names = TRUE, pattern = 'png'),
   height = 700,
-  width = '100%'
+  width = '100%',
 ) %synch%
   (slickR(
     c("RStudio provides this app every time you create a new shiny application.",
