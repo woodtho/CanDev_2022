@@ -18,7 +18,7 @@ library(scales) # Formatting the scales and labels on the plot
 
 # Data Import -------------------------------------------------------------
 
-# Notice that the data files need to be located in the same directory as the
+# Notice that the data files need to be in the same directory as the
 # app. When the app is deployed to a server, the server needs to be able to
 # access the data, and it can only do that if the data is in a location the
 # server can access.
@@ -44,10 +44,10 @@ max_year <- max(rd_data$REF_DATE)
 ui <- fluidPage(# Add a title
   titlePanel("R&D Personnel"),
   
-  # We will use a sidebarLayout to orginize our app, with the inputs in the
+  # We will use a sidebarLayout to organize our app, with the inputs in the
   # sidebarPanel, and the outputs in the mainPanel
   sidebarLayout(
-    # By default the side bar has a width of 4, but we don't need that much space
+    # By default, the side bar has a width of 4, but we don't need that much space
     sidebarPanel(
       width = 3,
       
@@ -105,7 +105,7 @@ ui <- fluidPage(# Add a title
       # creates this output
       plotOutput("plot",
                  
-                 # The default plot height can be kind of small, so I am
+                 # The default plot height can be small, so I am
                  # increasing the height of the plot
                  height = "550px"),
       
@@ -126,13 +126,13 @@ ui <- fluidPage(# Add a title
 server <- function(input, output) {
   # creates the html for plotOutput("plot")
   output$plot <- renderPlot({
-    # This is a static dataframe that we created when the app was launched.
+    # This is a static data frame that we created when the app was launched.
     rd_data %>%
       
       # We can filter that static df using the inputs to create a df that is
       # reactive to the inputs
       filter(
-        # A two value slider returns a vector with the min and max values of the
+        # A two-value slider returns a vector with the min and max values of the
         # slider. Using the between function to check that the REF_DATE falls
         # within that range from the slider
         between(REF_DATE, min(input$year), max(input$year)),
