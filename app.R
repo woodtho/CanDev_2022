@@ -18,11 +18,26 @@ library(scales) # Formatting the scales and labels on the plot
 
 # Data Import -------------------------------------------------------------
 
-# Notice that the data files need to be in the same directory as the
-# app. When the app is deployed to a server, the server needs to be able to
-# access the data, and it can only do that if the data is in a location the
-# server can access.
-rd_data <- read_csv("Data/27100337-eng/27100337.csv") %>%
+# Data files need to be in a location that is discoverable by your app. This can
+# mean that it is located in sub directory of your app, or hosted somewhere
+# online that your app can read it from. Storing your data somewhere else on
+# your computer can work when you are running the app locally, but will break if
+# you try to deploy your app.
+
+# By default this app uses the data from a public GitHub Repo
+
+# data_file_path <- 
+#   "https://raw.githubusercontent.com/woodtho/CanDev_2022/main/Data/27100337-eng/27100337.csv"
+
+# If you have cloned the repo you can also run the app using the data in the
+# `CanDev_2022/Data` directory. Notice that the file path is specified relative
+# to the app folder.
+
+data_file_path <- "Data/27100337-eng/27100337.csv"
+
+
+rd_data <- 
+  read_csv(data_file_path) %>%
   
   # This data cleaning is optional
   filter(

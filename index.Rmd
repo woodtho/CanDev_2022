@@ -29,10 +29,10 @@ R will open a new project for the shiny app, which will contain one file (`app.R
 
 This is the home of your app, and any data, pictures, etc. you need for your app to run need to be stored in the same directory so that they can be accessed by the app once it is deployed.
 
-> Note: Make sure you have shiny installed. 
+> Note: Make sure you have the required packages installed. 
 
 ```{r eval=FALSE, echo=TRUE} 
-install.packages("shiny")
+install.packages(c("tidyverse", "shiny", "scales"))
 ```
 
 ## Clone the workshop
@@ -111,7 +111,7 @@ The reactivity framework used by shiny means that:
 > You can copy and paste almost all of the code in this workshop into your R console to launch a shiny app. Please ensure that you have installed the required packages.
 
 ```{r eval=FALSE, echo=TRUE}
-install.packages("shiny")
+install.packages(c("tidyverse", "shiny", "scales"))
 ```
 
 - Whenever you create a shiny app, you should work from a template. 
@@ -128,7 +128,7 @@ library(shiny)
 # Code that creates the UI of the app
 ui <- fluidPage(
   # Title for your app
-  titlePanel(), 
+  titlePanel(title = ""), 
   
   sidebarLayout(
     
@@ -240,7 +240,7 @@ Until now, the apps have been simple and contained mostly static elements that w
 
 `*Input(inputId, label, ...)`
 
-- inputId must be a string, and it must be unique. You cannot use special characters, other than underscores.
+- *inputId must be a string*, and it *must be unique*. You *cannot use special characters, other than underscores.*
   - It creates the id for your input element in HTML and is used to index into the input object in the server
 - label describes what the input is for to the user and can use special characters.
 - ... means that there are some other specific arguments that are required, depending on the input being used (usually this is something like value or choices).
@@ -302,6 +302,7 @@ shinyApp(ui, server)
 `*Output(outputId, ...)`
 
 - Output typically only require the outputId.
+  - *outputId must be a string*, and it *must be unique*. You *cannot use special characters, other than underscores.*
   - The ID links the output in the UI with the HTML rendered in the server.
 
 #### Example
@@ -344,6 +345,7 @@ shinyApp(ui, server)
 ```
 
 - Notice that each output in the UI has a corresponding entry in the server.
+- Unlike in the UI, elements in the server are *not combined with a comma!*
 - Each output in the server is saved into a `output` object (`output$outputId`), and the UI has a corresponding entry for each ID
 - There are different rendering functions used. These turn the outputs into HTML that can be shown in the UI
 
@@ -461,7 +463,7 @@ If you want to share a shiny app with the public, or someone who doesn't have R 
 
 ## R&D Personnel App
 
-To run this code, please clone the project using the instructions above. 
+Once you have cloned the repo, you can launch the app by running this code while the project is open. Please clone the project using the instructions above. You can copy and paste the source code in the final code chunk in a console to launch the app, although this requires that you have internet access).
 
 ```{r eval=FALSE, echo=TRUE}
 runApp()
@@ -489,3 +491,225 @@ You can look at the source code for the shiny app in `CanDev_2022/app.R`.
       - Using the `renderDataTable({ # Code that returns a table})` function we can turn code that creates a table (or table like object) into an output that we can display
       - To make the table interactive, we filter the static data we loaded at the start using the inputs.
       
+```{r eval=FALSE, echo=TRUE}
+# Script name: R&D Personnel shiny app
+
+# Author: Thomas Wood (thomas.wood@statcan.gc.ca)
+
+# Date Created: 04-02-2022
+
+# Notes: Any code that is above the UI in a shiny app is run once when the app
+# is started. We can use this space to load the packages and read in some data
+# to display
+
+# Packages ----------------------------------------------------------------
+
+# install.packages(c("tidyverse", "shiny", "scales"))
+
+library(tidyverse) # Data manipulation and plotting
+library(shiny) # Creates the shiny app
+library(scales) # Formatting the scales and labels on the plot
+
+# Data Import -------------------------------------------------------------
+
+# Data files need to be in a location that is discoverable by your app. This can
+# mean that it is located in sub directory of your app, or hosted somewhere
+# online that your app can read it from. Storing your data somewhere else on
+# your computer can work when you are running the app locally, but will break if
+# you try to deploy your app.
+
+# By default this app uses the data from a public GitHub Repo
+data_file_path <- 
+  "https://raw.githubusercontent.com/woodtho/CanDev_2022/main/Data/27100337-eng/27100337.csv"
+
+# If you have cloned the repo you can also run the app using the data in the
+# `CanDev_2022/Data` directory. Notice that the file path is specified relative
+# to the app folder.
+
+# data_file_path <- "Data/27100337-eng/27100337.csv"
+
+
+rd_data <- 
+  read_csv(data_file_path) %>%
+  
+  # This data cleaning is optional
+  filter(
+    !`Occupational category` %in% c(
+      "Researchers and research managers",
+      "Research and development technical, administrative and support staff"
+    )
+  ) %>%
+  mutate(across(contains(" "), fct_inorder)) %>%
+  mutate(across(`Occupational category`, fct_rev))
+
+# We are referencing the min/max years from the data a lot, so I extracted them
+# into variables
+min_year <- min(rd_data$REF_DATE)
+max_year <- max(rd_data$REF_DATE)
+
+# UI code -----------------------------------------------------------------
+
+ui <- fluidPage(# Add a title
+  titlePanel("R&D Personnel"),
+  
+  # We will use a sidebarLayout to organize our app, with the inputs in the
+  # sidebarPanel, and the outputs in the mainPanel
+  sidebarLayout(
+    # By default, the side bar has a width of 4, but we don't need that much space
+    sidebarPanel(
+      width = 3,
+      
+      # look for where input$year occurs in the server to see where the year
+      # input impacts the data
+      sliderInput(
+        "year",
+        "Year",
+        sep = "",
+        min = min_year,
+        max = max_year,
+        # we are using a vector here to have a slider with two values
+        value = c(max_year - 2, max_year)
+      ),
+      
+      # look for where input$category occurs in the server to see where the
+      # category input impacts the data
+      selectInput(
+        'category',
+        "Occupational category",
+        
+        # Using `unique()` lets the app read the choices from the
+        # data. You can also manually supply choices using a vector
+        # (e.g., `c("Choice 1", "Choice 2")`)
+        choices = unique(rd_data$`Occupational category`),
+        # Select all options by default
+        selected = unique(rd_data$`Occupational category`),
+        # You can use the multiple argument to control if the user can
+        # select multiple options, or only on (the default)
+        multiple = TRUE
+      ),
+      
+      # look for where input$coc occurs in the server to see where the country
+      # of control input impacts the data
+      selectInput(
+        "coc",
+        "Country of control",
+        # reading choices from the data again
+        choices = unique(rd_data$`Country of control`)
+      ),
+      
+      # look for where input$NAICS occurs in the server to see where the NAICS
+      # input impacts the data
+      selectInput(
+        "NAICS",
+        "North American Industry Classification System (NAICS)",
+        choices = unique(rd_data$`North American Industry Classification System (NAICS)`)
+      )
+      
+    ),
+    
+    # Outputs are in the mainPanel
+    mainPanel(
+      # Look at the output$plot expression in the server to see the code that
+      # creates this output
+      plotOutput("plot",
+                 
+                 # The default plot height can be small, so I am
+                 # increasing the height of the plot
+                 height = "550px"),
+      
+      # Adding a horizontal line above the table to better distinguish between
+      # the plot area and the table area
+      hr(),
+      
+      # Look at the output$table expression in the server to see the code that
+      # creates this output
+      dataTableOutput("table")
+    )
+  ))
+
+
+
+# Server Code -------------------------------------------------------------
+
+server <- function(input, output) {
+  # creates the html for plotOutput("plot")
+  output$plot <- renderPlot({
+    # This is a static data frame that we created when the app was launched.
+    rd_data %>%
+      
+      # We can filter that static df using the inputs to create a df that is
+      # reactive to the inputs
+      filter(
+        # A two-value slider returns a vector with the min and max values of the
+        # slider. Using the between function to check that the REF_DATE falls
+        # within that range from the slider
+        between(REF_DATE, min(input$year), max(input$year)),
+        
+        # Single selectInputs() return a single string that we can filter against
+        `Country of control`	== input$coc,
+        `North American Industry Classification System (NAICS)` == input$NAICS,
+        
+        # input$category accepts multiple selections, so we are checking that
+        # the value is in the vector returned by input$category
+        `Occupational category` %in% input$category
+      ) %>%
+      
+      ggplot(
+        aes(
+          x = as.factor(REF_DATE),
+          y = VALUE,
+          fill = `Occupational category`,
+          group = `Occupational category`,
+          label = comma(VALUE, accuracy = 1, suffix = " FTE")
+        )
+      ) +
+      
+      geom_col(position = position_dodge()) +
+      geom_label(position = position_dodge(width = 0.9),
+                 alpha = 0.5,
+                 fill = "white") +
+      
+      coord_flip() +
+      scale_fill_discrete(guide = guide_legend(
+        title.position = "top",
+        title.hjust = 0.5,
+        ncol = 2,
+        reverse = TRUE
+      )) +
+      scale_y_continuous(labels = comma_format(),
+                         breaks = pretty_breaks(10)) +
+      theme_minimal(base_size = 20) +
+      theme(legend.position = "bottom") +
+      labs(x = "",
+           y = "full-time equivalent (FTE)")
+    
+  })
+  
+  output$table <- renderDataTable({
+    rd_data %>%
+      filter(
+        between(REF_DATE, min(input$year), max(input$year)),
+        `Country of control`	== input$coc,
+        `North American Industry Classification System (NAICS)` == input$NAICS,
+        `Occupational category` %in% input$category
+      ) %>%
+      select(-DGUID, -GEO,-UOM:-COORDINATE,-SYMBOL:-DECIMALS) %>%
+      arrange(
+        REF_DATE,
+        `North American Industry Classification System (NAICS)`,
+        `Country of control`,
+        desc(`Occupational category`)
+      )
+    
+  })
+  
+}
+
+
+# Launch the app ----------------------------------------------------------
+
+
+shinyApp(ui, server)
+
+```
+
