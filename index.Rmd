@@ -221,20 +221,20 @@ Until now, the apps have been simple and contained mostly static elements that w
 - Are created with an `*Input()` function
 - They create HTML for your app's UI and send values from the web page to the server
 
-| Function             | Collects                                                                                                 |
-|----------------------|----------------------------------------------------------------------------------------------------------|
-| `actionButton()`       | A button press                                                                                           |
-| `checkboxInput()`      | The state of a check box (TRUE/FALSE)                                                                     |
-| `checkboxGroupInput()` | The state of a group of check boxes (a vector of selected values)                                         |
-| `dateInput()`          | A single date                                                                                |
-| `dateRangeInput()`     | A range of dates (a vector of the min and max date)                                                      |
-| `fileInput()`          | A file                                                                                                   |
-| `numericInput()`       | A numeric value                                                                                          |
-| `passwordInput()`      | A password                                                                                               |
-| `radioButtons()`       | The state of a group of radio buttons (Which option is selected)                                         |
+| Function               | Collects                                                                                                       |
+|------------------------|----------------------------------------------------------------------------------------------------------------|
+| `actionButton()`       | A button press                                                                                                 |
+| `checkboxInput()`      | The state of a check box (TRUE/FALSE)                                                                          |
+| `checkboxGroupInput()` | The state of a group of check boxes (a vector of selected values)                                              |
+| `dateInput()`          | A single date                                                                                                  |
+| `dateRangeInput()`     | A range of dates (a vector of the min and max date)                                                            |
+| `fileInput()`          | A file                                                                                                         |
+| `numericInput()`       | A numeric value                                                                                                |
+| `passwordInput()`      | A password                                                                                                     |
+| `radioButtons()`       | The state of a group of radio buttons (Which option is selected)                                               |
 | `selectInput()`        | The current selection(s) for a drop-down list (vector of length 1, or more, that includes only selected values)|
-| `sliderInput()`        | A single number/date/date time or a range of the same (a single value, or a vector of the min and max)   |
-| `textInput()`          | A character string  (a vector of the entered text)                                                                   |
+| `sliderInput()`        | A single number/date/date time or a range of the same (a single value, or a vector of the min and max)         |
+| `textInput()`          | A character string  (a vector of the entered text)                                                             |
 
 #### Syntax
 
@@ -286,8 +286,8 @@ shinyApp(ui, server)
   - We will talk about the server component of output in a moment.
   - You must build the object in the server separately.
 
-| Function             | Inserts              |
-|----------------------|----------------------|
+| Function               | Inserts              |
+|------------------------|----------------------|
 | `dataTableOutput()`    | An interactive table |
 | `tableOutput()`        | A table              |
 | `imageOutput()`        | An image             |
@@ -373,8 +373,8 @@ Every output in the UI needs to have a value created in the server
 
 For an output to be displayed by the webpage, it must be rendered, which means it must be converted into HTML that the webpage can display. Which function you use to render an output depends on its type. 
 
-| Function          | Creates              |
-|-------------------|----------------------|
+| Function            | Creates              |
+|---------------------|----------------------|
 | `renderDataTable()` | An interactive table |
 | `renderTable()`     | A table              |
 | `renderPlot()`      | A plot               |
@@ -459,6 +459,8 @@ shinyApp(ui, server)
 You can share a shiny app with anyone who has R and the required packages installed on their computer simply by sharing the code, and other required files, with them.
 
 If you want to share a shiny app with the public, or someone who doesn't have R and the required packages, you need to deploy your app to a shiny server. Shinyapps.io provides a free service that lets you upload a limited number of apps (there are paid plans with more active hours that allow for more apps to be loaded). [You can look at this article for details on deploying apps to Shinyapps.io.](https://shiny.rstudio.com/articles/shinyapps.html)
+
+Before you release apps to the public, you need to consider security. While hosting services like Shinyapps.io take measures to protect against attackers using your app to access other apps on the server, there's still a lot that a motivated attacker can do within your app if you do not take precautions. Take a look at [this chapter of Mastering Shiny](https://mastering-shiny.org/scaling-security.html) for some things you should consider, such as validating inputs in the server, preventing a user from executing arbitrary code, and properly escaping SQL to prevent SQL injection attacks.
 
 
 ## R&D Personnel App
@@ -713,3 +715,13 @@ shinyApp(ui, server)
 
 ```
 
+
+## Further Resources
+
+Check out [RStudio's](https://shiny.rstudio.com/tutorial/) collection of other Shiny resources for more information on building more complicated apps.
+
+<style>
+.tocify-extend-page {
+  height: 100px !important;
+}
+</style>
