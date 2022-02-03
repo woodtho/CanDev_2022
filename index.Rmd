@@ -58,6 +58,18 @@ slickR(
   list.files("img", full.names = TRUE, pattern = 'png'),
   height = 700,
   width = '100%',
+  objLinks = paste0("https://github.com/woodtho/CanDev_2022/blob/main/img/", 
+                    c("01%20-%20App%20Code.png", "02%20-%20App%20Code.png",
+                      "03%20-%20App%20Code.png","04%20-%20App%20Code.png",
+                      "05%20-%20App%20Code.png","06%20-%20App.png",
+                      "07%20-%20App%20UI.png","08%20-%20App%20Server.png",
+                      "09%20-%20App%20Steady%20State.png",
+                      "10%20-%20App%20Change%20Input.png",
+                      "11%20-%20App%20Server%20Reads%20input.png",
+                      "12%20-%20App%20server%20Uses%20input%20to%20update%20outputs.png",
+                      "13%20-%20App%20Server%20sends%20new%20output%20to%20UI.png",
+                      "14%20-%20App%20outputs%20are%20updated%20in%20UI.png"),
+                    "?raw=true")
 ) %synch%
   (slickR(
     c("RStudio provides this app every time you create a new shiny application.",
@@ -89,7 +101,7 @@ slickR(
       "When the new HTML is stored in the output object, the webpage is refreshed and the outputs are updated. Once this process is complete, the app enters a steady state and awaits a new input."
     ),
     slideType = 'p'
-  ) + settings(arrows = FALSE))
+  ) + settings(arrows = FALSE, adaptiveHeight = TRUE, ))
 
 
 ```
@@ -209,7 +221,7 @@ shinyApp(ui, server)
 
 ```
 
-- Notice that the elements we added inside the sidebarPanel and mainPanel are separated with commas!
+- Notice that the elements we added **inside the sidebarPanel and mainPanel are separated with commas!**
 - [See this tutorial for more examples of adding static content to your interface, including adding images and aligning text.](http://shiny.rstudio-staging.com/tutorial/written-tutorial/lesson2/) 
 
 ## Building your app around **Inputs and outputs**
@@ -240,7 +252,7 @@ Until now, the apps have been simple and contained mostly static elements that w
 
 `*Input(inputId, label, ...)`
 
-- *inputId must be a string*, and it *must be unique*. You *cannot use special characters, other than underscores.*
+- **inputId must be a string**, and it **must be unique**. You **cannot use special characters, other than underscores.**
   - It creates the id for your input element in HTML and is used to index into the input object in the server
 - label describes what the input is for to the user and can use special characters.
 - ... means that there are some other specific arguments that are required, depending on the input being used (usually this is something like value or choices).
@@ -302,7 +314,7 @@ shinyApp(ui, server)
 `*Output(outputId, ...)`
 
 - Output typically only require the outputId.
-  - *outputId must be a string*, and it *must be unique*. You *cannot use special characters, other than underscores.*
+  - **outputId must be a string**, and it **must be unique**. You **cannot use special characters, other than underscores.**
   - The ID links the output in the UI with the HTML rendered in the server.
 
 #### Example
@@ -345,7 +357,7 @@ shinyApp(ui, server)
 ```
 
 - Notice that each output in the UI has a corresponding entry in the server.
-- Unlike in the UI, elements in the server are *not combined with a comma!*
+- Unlike in the UI, elements in the server are **not combined with a comma!**
 - Each output in the server is saved into a `output` object (`output$outputId`), and the UI has a corresponding entry for each ID
 - There are different rendering functions used. These turn the outputs into HTML that can be shown in the UI
 
